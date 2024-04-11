@@ -1,15 +1,29 @@
 #include <iostream>
+#include <string>
 #include <cctype>
 
-bool isCardValid(int digits[], int size) {
+bool isNumeric(const std::string& s) {
+    for (char c : s) {
+        if (!isdigit(c)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool isCorrectLength(const std::string& s) {
+    return (s.length() == 16);
+}
+
+bool isCardValid(const std::string& cardNumber) {
     int sumStep1 = 0, sumStep2 = 0;
 
-    for (int i = size - 1; i >= 0; i -= 2) {
-        sumStep1 += digits[i];
+    for (int i = cardNumber.length() - 1; i >= 0; i -= 2) {
+        sumStep1 += cardNumber[i] - '0';
     }
 
-    for (int i = size - 2; i >= 0; i -= 2) {
-        int doubled = digits[i] * 2;
+    for (int i = cardNumber.length() - 2; i >= 0; i -= 2) {
+        int doubled = (cardNumber[i] - '0') * 2;
         sumStep2 += (doubled % 10) + (doubled / 10);
     }
 
@@ -19,36 +33,29 @@ bool isCardValid(int digits[], int size) {
 }
 
 int main() {
-    const int SIZE = 8;
-    int digits[SIZE];
-    char input[SIZE + 1];
+    std::string input;
 
     while (true) {
-        std::cout << "Enter 8-digit credit card # or Q to quit: ";
-        std::cin.getline(input, SIZE + 1);
+        std::cout << "Enter 16-digit credit card # or Q to quit: ";
+        std::getline(std::cin, input);
 
-        if (toupper(input[0]) == 'Q')
+        if (input.size() == 1 && toupper(input[0]) == 'Q')
             break;
 
-        bool validInput = true;
-        for (int i = 0; i < SIZE; i++) {
-            if (!isdigit(input[i])) {
-                validInput = false;
-                break;
-            }
-            digits[i] = input[i] - '0';
+        if (!isNumeric(input)) {
+            std::cout << "Error - card number must contain only digits." << std::endl;
+            continue;
         }
 
-        if (validInput) {
-            bool isValid = isCardValid(digits, SIZE);
-            if (isValid)
-                std::cout << "Card is valid." << std::endl;
-            else
-                std::cout << "Card is not valid." << std::endl;
+        if (!isCorrectLength(input)) {
+            std::cout << "Error - card number must contain 16 digits." << std::endl;
+            continue;
         }
-        else {
-            std::cout << "Invalid input. Please enter a valid 8-digit number." << std::endl;
-        }
+
+        if (isCardValid(input))
+            std::cout << "Card is valid." << std::endl;
+        else
+            std::cout << "Card is not valid." << std::endl;
     }
 
     return 0;
